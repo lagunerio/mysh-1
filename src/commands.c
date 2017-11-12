@@ -12,6 +12,8 @@ static struct built_in_command built_in_commands[] = {
   { "fg", do_fg, validate_fg_argv }
 };
 
+static pid_t pid; //set pid
+
 static int is_built_in_command(const char* command_name)
 {
   static const int n_built_in_commands = sizeof(built_in_commands) / sizeof(built_in_commands[0]);
@@ -26,12 +28,33 @@ static int is_built_in_command(const char* command_name)
 }
 
 /*
- * Description: Currently this function only handles single built_in commands. You should modify this structure to launch process and offer pipeline functionality.
+ * Description: Currently this function only handles single built_in commands.
+ * You should modify this structure to launch process and offer pipeline functionality.
  */
 int evaluate_command(int n_commands, struct single_command (*commands)[512])
 {
   if (n_commands > 0) {
     struct single_command* com = (*commands);
+
+    //process creation
+    pid = fork();
+
+    //handle processes
+    if(pid<0){
+      fprintf(stderr, "Fork Failed\n");
+      return 1;
+    }
+    else if(pid==0){
+      char *arg[] = {com->argv[0], 0};
+      execv(arg[0], arg);
+
+      if(strcmp(com->argv[1], "&")==0){
+        execv(arg[0], arg);
+        printf("%ld\n", (long)getpid());
+      }
+    }
+    else wait();
+
 
     assert(com->argc != 0);
 
