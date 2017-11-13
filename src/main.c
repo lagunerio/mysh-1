@@ -25,9 +25,9 @@ int main()
 
   while (1) {
 
-    if(signal(SIGINT, catch_sigint);) break;
-    else if(signal(SIGSTP, catch_sigtstp)) break;
-    else fgets(buf, 8096, stdin);
+    signal(SIGINT, catch_sigint););
+    signal(SIGSTP, catch_sigtstp));
+    fgets(buf, 8096, stdin);
 
     sigemptyset(&act.sa_mask);
 
