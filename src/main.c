@@ -11,7 +11,7 @@
 
 
 //structure to handle signals
-
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
 struct sigaction
 {
   void(*sa_handler)int
