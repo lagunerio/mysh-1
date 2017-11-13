@@ -26,13 +26,13 @@ int main()
 
   while (1) {
 
-    if(signal(SIGINT, SIG_IGN) != SIG_IGN){
+    if(signal(SIGINT, SIG_IGN) == SIG_IGN){
       catch_sigint(SIGINT);
-      break;
+      continue;
     }
-    else if(signal(SIGTSTP, SIG_IGN) != SIG_IGN){
+    else if(signal(SIGTSTP, SIG_IGN) == SIG_IGN){
       catch_sigtstp(SIGTSTP);
-      break;
+      continue;
     }
     //signal(SIGSTP, catch_sigtstp());
     else fgets(buf, 8096, stdin);

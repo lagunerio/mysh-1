@@ -16,6 +16,8 @@ static struct built_in_command built_in_commands[] = {
 };
 
 static pid_t pid; //set pid
+static long pid_bg; //rememver pid from bg
+static int pif_flag = 0; //toggle bg/fg
 
 static int is_built_in_command(const char* command_name)
 {
@@ -36,30 +38,52 @@ static int is_built_in_command(const char* command_name)
  */
 int evaluate_command(int n_commands, struct single_command (*commands)[512])
 {
+  int child_status;
+  pid_t tmp_pid;
+
   if (n_commands > 0) {
     struct single_command* com = (*commands);
 
-    //process creation
+    //process creation; shild
     pid = fork();
 
     //handle processes
     if(pid<0){
-      fprintf(stderr, "Fork Failed\n");
+      fprintf(stderr, "Error: cannot fork child\n");
       return 1;
     }
     else if(pid==0){
-      char *arg[] = {com->argv[0], 0};
+      char *arg[] = {com->argv[0], com-> argv[1], 0};
       execv(arg[0], arg);
 
       if(strcmp(com->argv[1], "&")==0){
-        execv(arg[0], arg);
-        printf("%ld\n", (long)getpid());
+        fprintf(stderr, "Error: Already forked a process.\n");
       }
+      return 1;
     }
-    else wait();
+    else{
+      pid_flag = 1;
+      execv(arg[0], arg);
+      pid_bg = (long)getpid();
+      printf("ld\n", pid_bg);
+    }
+  }
+
+  if(strcmp(arg[0], "fg")==0){
+    fprintf(stderr, "Warning: no background process\n");
+  }
+  else if{
+    pid_flag = 0;
+    printf("%ld running\n", pid_bg);
+  }
+  else{
+    do{
+      tmp_pid = wait(&child_status);
+    }while(tmp_pid != pid);
+  }
 
 
-    assert(com->argc != 0);
+    //assert(com->argc != 0);
 
     int built_in_pos = is_built_in_command(com->argv[0]);
     if (built_in_pos != -1) {
