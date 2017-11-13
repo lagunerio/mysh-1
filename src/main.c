@@ -30,7 +30,7 @@ int main()
       catch_sigint(SIGINT);
       continue;
     }
-    else if(signal(SIGTSTP, SIG_IGN) == SIG_IGN){
+    else if(signal(SIGTSTP, SIG_IGN) != SIG_IGN){
       catch_sigtstp(SIGTSTP);
       continue;
     }
