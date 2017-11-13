@@ -18,7 +18,7 @@ struct sigaction
   int sa_flags;
 }
 */
-struct sigaction act;
+//struct sigaction act;
 
 int main()
 {
