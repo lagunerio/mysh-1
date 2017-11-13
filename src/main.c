@@ -26,7 +26,7 @@ int main()
 
   while (1) {
 
-    if(signal(SIGINT, SIG_IGN) == SIG_IGN){
+    if(signal(SIGINT, SIG_IGN) != SIG_IGN){
       catch_sigint(SIGINT);
       continue;
     }
