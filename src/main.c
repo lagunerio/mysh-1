@@ -30,8 +30,8 @@ int main()
       catch_sigint(SIGINT);
       break;
     }
-    else if(signal(SIGSTP, SIG_IGN) != SIG_IGN){
-      catch_sigtstp(SIGSTP);
+    else if(signal(SIGTSTP, SIG_IGN) != SIG_IGN){
+      catch_sigtstp(SIGTSTP);
       break;
     }
     //signal(SIGSTP, catch_sigtstp());
