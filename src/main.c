@@ -26,8 +26,8 @@ int main()
 
   while (1) {
 
-    signal(SIGINT, catch_sigint););
-    signal(SIGSTP, catch_sigtstp));
+    signal(SIGINT, catch_sigint());
+    signal(SIGSTP, catch_sigtstp());
     fgets(buf, 8096, stdin);
 
     sigemptyset(&act.sa_mask);
