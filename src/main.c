@@ -9,7 +9,7 @@
 #include "built_in.h"
 #include "utils.h"
 
-
+/*
 //structure to handle signals
 int sigaction(int signum, const struct sigaction *act);
 struct sigaction
@@ -18,6 +18,7 @@ struct sigaction
   sigset_t sa_mask;
   int sa_flags;
 }
+*/
 struct sigaction act;
 
 int main()
