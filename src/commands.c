@@ -16,8 +16,8 @@ static struct built_in_command built_in_commands[] = {
 };
 
 static pid_t pid; //set pid
-static long pid_bg; //rememver pid from bg
-static int pif_flag = 0; //toggle bg/fg
+static long pid_bg; // remember pid from bg
+static int pid_flag=0 ; // toggle bg/fg
 
 static int is_built_in_command(const char* command_name)
 {
@@ -38,52 +38,65 @@ static int is_built_in_command(const char* command_name)
  */
 int evaluate_command(int n_commands, struct single_command (*commands)[512])
 {
-  int child_status;
-  pid_t tmp_pid;
+  int child_status; // Check the status of the child process.
+  pid_t temp_pid;
 
   if (n_commands > 0) {
     struct single_command* com = (*commands);
 
-    //process creation; shild
+    //Create a child process
     pid = fork();
 
-    //handle processes
-    if(pid<0){
-      fprintf(stderr, "Error: cannot fork child\n");
+    //If there is no problem, then run child and wait.
+    if(pid < 0){
+      //There was a problem with fork
+      fprintf(stderr, "Error: Cannot fork child.\n");
       return 1;
     }
-    else if(pid==0){
-      char *arg[] = {com->argv[0], com-> argv[1], 0};
+    else if(pid==0) {
+      // We are in a child process
+      char *arg[] = {com->argv[0], com->argv[1], 0};
+
       execv(arg[0], arg);
 
       if(strcmp(com->argv[1], "&")==0){
-        fprintf(stderr, "Error: Already forked a process.\n");
+
+        // We only allow one bg for this assignment.
+	if(pid_flag == 1){
+           fprintf(stderr, "Error: Already forked a process.\n");
+	   return 1;
+	} else {
+
+	  // Run the program in the background and prints the pid number.
+	  pid_flag = 1;
+	  execv(arg[0], arg);
+	  pid_bg = (long)getpid();
+	  printf("%ld\n", pid_bg);
+	}
       }
-      return 1;
+
+      if(strcmp(arg[0], "fg")==0) {
+
+	// Do nothing if there is no background process already running.
+	// (Note to TA: I am displaying warning message for this assignment.)
+	if(pid_flag == 0){
+	  fprintf(stderr, "Warning: There is no background process to bring forward.\n");
+	} else {
+
+	  // Bring the background task forward.
+	  pid_flag=0;
+	  printf("%ld running \n", pid_bg);
+	}
+      }
     }
-    else{
-      pid_flag = 1;
-      execv(arg[0], arg);
-      pid_bg = (long)getpid();
-      printf("ld\n", pid_bg);
+    else {
+      // Wait for the child process to terminate.
+      do {
+        temp_pid = wait(&child_status);
+      } while(temp_pid != pid);
     }
-  }
 
-  if(strcmp(arg[0], "fg")==0){
-    fprintf(stderr, "Warning: no background process\n");
-  }
-  else if{
-    pid_flag = 0;
-    printf("%ld running\n", pid_bg);
-  }
-  else{
-    do{
-      tmp_pid = wait(&child_status);
-    }while(tmp_pid != pid);
-  }
-
-
-    //assert(com->argc != 0);
+    //    assert(com->argc != 0);
 
     int built_in_pos = is_built_in_command(com->argv[0]);
     if (built_in_pos != -1) {
@@ -100,7 +113,7 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
     } else if (strcmp(com->argv[0], "exit") == 0) {
       return 1;
     } else {
-      fprintf(stderr, "%s: command not found\n", com->argv[0]);
+      //      fprintf(stderr, "%s: command not found\n", com->argv[0]);
       return -1;
     }
   }
