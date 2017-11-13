@@ -5,13 +5,13 @@
 
 //sigset_t set;
 
-void catch_sigint(int)
+void catch_sigint(int signalNo)
 {
   printf("sigint\n");
 
 }
 
-void catch_sigtstp(int)
+void catch_sigtstp(int signalNO)
 {
   //signal(SIGSTP, SIG_IGN); //ignore ctrl+z signal
   printf("sigtstp\n");
