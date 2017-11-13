@@ -1,6 +1,7 @@
-#include "signal_handlers.h"
+//#include "signal_handlers.h"
+#include <signal.h>
 
-sigset_t set;
+//sigset_t set;
 
 void catch_sigint(int)
 {
