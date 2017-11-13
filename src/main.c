@@ -37,7 +37,7 @@ int main()
       catch_sigint(1);
       continue;
     }
-    if(sigaction(SIGTSPT, &act, 0) == SIG_ERR){
+    if(sigaction(SIGTSTP, &act, 0) == SIG_ERR){
       catch_sigtstp(2);
       continue;
     }
