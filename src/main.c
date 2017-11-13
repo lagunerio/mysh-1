@@ -11,7 +11,6 @@
 
 
 //structure to handle signals
-int sigaction(int signum, const struct sigaction *act, struct sigaction *sa_flags);
 
 struct sigaction
 {
