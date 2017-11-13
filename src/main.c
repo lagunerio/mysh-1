@@ -16,6 +16,9 @@ struct sigaction
   void(*sa_handler)int
   sigset_t sa_mask;
   int sa_flags;
+
+
+
 }
 */
 //struct sigaction act;
@@ -26,16 +29,10 @@ int main()
 
   while (1) {
 
-    if(signal(SIGINT, SIG_IGN) != SIG_IGN){
-      catch_sigint(SIGINT);
-      continue;
-    }
-    else if(signal(SIGTSTP, SIG_IGN) != SIG_IGN){
-      catch_sigtstp(SIGTSTP);
-      continue;
-    }
+    signal(SIGINT, catch_sigint(SIGINT));
+    signal(SIGTSTP, catch_sigtstp(SIGTSTP));
     //signal(SIGSTP, catch_sigtstp());
-    else fgets(buf, 8096, stdin);
+    fgets(buf, 8096, stdin);
 
     //sigemptyset(&act.sa_mask);
 
