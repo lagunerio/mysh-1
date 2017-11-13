@@ -1,5 +1,7 @@
 //#include "signal_handlers.h"
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 //sigset_t set;
 
