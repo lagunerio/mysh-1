@@ -4,11 +4,12 @@ sigset_t set;
 
 void catch_sigint(int signalNo)
 {
-  signal(SIGINT, SIG_IGN); //ignore ctrl+z signal
+  printf("sigint\n");
 
 }
 
 void catch_sigtstp(int signalNo);
 {
-  signal(SIGSTP, SIG_IGN); //ignore ctrl+z signal
+  //signal(SIGSTP, SIG_IGN); //ignore ctrl+z signal
+  printf("sigtstp\n");
 }
