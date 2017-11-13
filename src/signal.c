@@ -1,11 +1,14 @@
-#include "signal.h"
+#include "signal_handlers.h"
 
-void catch_sigint(int)
+sigset_t set;
+
+void catch_sigint(int signalNo)
 {
-  // TODO: File this!
+  signal(SIGINT, SIG_IGN); //ignore ctrl+z signal
+
 }
 
-void catch_sigtstp(int);
+void catch_sigtstp(int signalNo);
 {
-  // TODO: File this!
+  signal(SIGSTP, SIG_IGN); //ignore ctrl+z signal
 }
