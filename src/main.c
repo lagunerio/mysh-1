@@ -51,7 +51,7 @@ int main()
       exit(1);
     }
     else if(sigaction(SIGTSTP, &act_tstp, 0)== SIG_ERR){
-      printf("sigaciton() error; act_tstp\n")
+      printf("sigaciton() error; act_tstp\n");
       exit(1);
     }
 
