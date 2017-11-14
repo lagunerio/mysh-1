@@ -1,4 +1,3 @@
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +6,6 @@
 
 #include "commands.h"
 #include "built_in.h"
-#include "signal_handlers.h"
 
 #define MAX_LINE 256
 
