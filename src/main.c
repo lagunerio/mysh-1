@@ -9,7 +9,7 @@
 #include "built_in.h"
 #include "utils.h"
 
-
+/*
 //structure to handle signals
 int sigaction(int signum, const struct sigaction *act);
 struct sigaction
@@ -20,19 +20,23 @@ struct sigaction
 }
 
 struct sigaction act;
-
+*/
 int main()
 {
   char buf[8096];
+  struct sigaction act_int;
+  struct sigaction act_tstp;
+  act_int.sa_handler = catch_sigint();
+  act_tstp.sa_handler = catch_sigtstp();
+
 
   while (1) {
 
-    int i=0;
-    struct sigaction act;
-    //act.sa_handler = my_signal;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = 0;
-
+    sigemptyset(&act_int.sa_mask);
+    sigemptyset(&act_tstp.sa_mask);
+    act_int.sa_flags = 0;
+    act_tstp.sa_flags = 0;
+/*
     if(sigaction(SIGINT, &act) == SIG_ERR){
       catch_sigint(1);
       continue;
@@ -41,6 +45,16 @@ int main()
       catch_sigtstp(2);
       continue;
     }
+*/
+    if(sigaction(SIGINT, &act_int, 0)== SIG_ERR){
+      printf("sigaction() error; act_int\n");
+      exit(1);
+    }
+    else if(sigaction(SIGTSTP, &act_tstp, 0)== SIG_ERR){
+      printf("sigaciton() error; act_tstp\n")
+      exit(1);
+    }
+
     fgets(buf, 8096, stdin);
 
     struct single_command commands[512];
