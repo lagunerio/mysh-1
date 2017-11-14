@@ -1,13 +1,35 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <sys/types.h>
+#include <pwd.h>
+
+#include <libgen.h>
+#include <linux/limits.h>
 
 #include "commands.h"
 #include "built_in.h"
+#include "signal_handlers.h"
 
 #define MAX_LINE 256
+
+#define BUFFERSIZE 128
+#define BLANK_SYMBOL ' '
+#define NULL_SYMBOL '\0'
+#define NEWLINE_SYMBOL '\n'
+#define COLON_SYMBOL ':'
+#define SLASH_SYMBOL '/'
+#define BLANK_STR " "
+#define NULL_STR "\0"
+#define NEWLINE_STR "\n"
+#define COLON_STR ":"
+#define SLASH_STR "/"
+#define PARENT_DIR_STR ".."
+#define PATH "PATH"
+
+static char *paths[BUFFERSIZE];
 
 static struct built_in_command built_in_commands[] = {
   { "cd", do_cd, validate_cd_argv },
@@ -18,6 +40,9 @@ static struct built_in_command built_in_commands[] = {
 static pid_t pid; //set pid
 static long pid_bg; // remember pid from bg
 static int pid_flag=0 ; // toggle bg/fg
+
+char *homedir;
+char *envp_path;
 
 static int is_built_in_command(const char* command_name)
 {
@@ -31,6 +56,36 @@ static int is_built_in_command(const char* command_name)
 
   return -1; // Not found
 }
+
+
+/*
+ * This function finds the path where the input command is
+ * stored in the system.
+ */
+void get_cmd_pth(char *cmd)
+{
+	int i;
+	char *path = calloc(BUFFERSIZE, sizeof(char*));
+	FILE *file;
+
+	paths[0]="/usr/local/bin/"; paths[1]="/usr/bin/"; paths[2]="/bin/";
+	paths[3]="/usr//sbin/"; paths[4]="/sbin/"; paths[5]= NULL;
+
+
+	// iterate over all possible paths
+	for(i = 0; paths[i]; i++) {
+		strcpy(path, paths[i]);
+		strncat(path, cmd, strlen(cmd));
+
+		// get the right path by testing it existence
+		if((file = fopen(path, "r"))) {
+			strncpy(cmd, path, strlen(path));
+			fclose(file);
+		}
+	}
+	free(path);
+}
+
 
 /*
  * Description: Currently this function only handles single built_in commands.
@@ -56,6 +111,34 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
     else if(pid==0) {
       // We are in a child process
       char *arg[] = {com->argv[0], com->argv[1], 0};
+
+      // *******************************************
+      // First, do Path Resolution for extra credits
+      // *******************************************
+
+      // Resolve arg[0]
+      if  ((strncmp(arg[0],"cd",2)!=0) && (strncmp(arg[0],"pwd",3)!=0)){
+	char *cmd = calloc(BUFFERSIZE, sizeof(char*));
+
+	strcpy (cmd, arg[0]);
+	get_cmd_pth(cmd);     // cmd with full path
+
+	strcpy (arg[0], cmd); // restore into arg[0]
+      }
+
+      // Resolve arg[1]
+      if (arg[1] != NULL) {
+	char sPath[PATH_MAX];
+	if (strncmp(arg[1], "~",1) == 0) {
+	  // realpath does not handle "~".
+	  homedir = getenv("HOME");
+	  strcpy (arg[1], homedir);
+	}
+	else {
+	  realpath(arg[1], sPath);
+	  strcpy (arg[1], sPath);
+	}
+      }
 
       execv(arg[0], arg);
 
@@ -96,7 +179,7 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
       } while(temp_pid != pid);
     }
 
-    //    assert(com->argc != 0);
+    assert(com->argc != 0);
 
     int built_in_pos = is_built_in_command(com->argv[0]);
     if (built_in_pos != -1) {
@@ -117,7 +200,6 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
       return -1;
     }
   }
-
   return 0;
 }
 
